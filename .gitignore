@@ -30,3 +30,7 @@ preferences.json
 *.spec.bak
 Thumbs.db
 .DS_Store
+node_modules/
+.astro/
+playwright-report/
+test-results/

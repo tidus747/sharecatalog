@@ -3,6 +3,14 @@
 The MIT license covers ShareCatalog source, not dependencies. Everything and ES
 remain external and are not redistributed.
 
+The documentation site adapts [Terminal Noir](https://github.com/nandomoreirame/terminalnoir-astro-theme)
+by Fernando Moreira (MIT). Its original notice is preserved in
+`licenses/Terminal-Noir-MIT.txt`. The Noir/Paper palette, global styles, typography
+and section component were adapted from upstream commit
+`f702aa1a2175f3e8ac4447e1d008c286728a1d0e`. Local font packages Inter, Newsreader
+and JetBrains Mono use the SIL Open Font License; their package notices apply.
+Astro, Tailwind CSS and their dependency licenses remain separate from the app.
+
 The `licenses/` directory contains unmodified LGPLv3, GPLv3 and GPLv2 texts from
 [Qt's official license directory](https://github.com/qt/qtbase/tree/dev/LICENSES).
 They are copied into the packaged app alongside installed-package notices.

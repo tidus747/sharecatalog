@@ -1,0 +1,138 @@
+---
+import '@fontsource-variable/inter';
+import '@fontsource-variable/newsreader';
+import '@fontsource-variable/jetbrains-mono';
+import '../styles/global.css';
+import '../styles/sharecatalog.css';
+import { cssVariables } from '../lib/palette';
+import { site, url } from '../lib/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title, description = site.description } = Astro.props;
+const pageTitle = title ? `${title} | ${site.name}` : `${site.name} | Documents, connected.`;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const block = (theme: 'dark' | 'light') =>
+  Object.entries(cssVariables(theme))
+    .map(([key, value]) => `${key}:${value}`)
+    .join(';');
+const themeCss = `:root{${block('dark')};color-scheme:dark}:root[data-theme="light"]{${block('light')};color-scheme:light}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{pageTitle}</title>
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href={url('favicon.svg')} type="image/svg+xml" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content={new URL(url('images/sharecatalog.png'), Astro.site).href} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#0b0b0c" />
+    <style is:inline set:html={themeCss} />
+    <script is:inline>
+      try {
+        if (localStorage.getItem('tn-theme') === 'light') document.documentElement.dataset.theme = 'light';
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">
+      Skip to content
+    </a>
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="wordmark" href={url()} aria-label="ShareCatalog home">
+          <span class="text-accent" aria-hidden="true">
+            ~/
+          </span>
+          sharecatalog<span class="cursor" aria-hidden="true"></span>
+        </a>
+        <nav aria-label="Main navigation">
+          <a href={url('docs/')} aria-current={Astro.url.pathname.includes('/docs') ? 'page' : undefined}>
+            Documentation
+          </a>
+          <a href={site.repository}>
+            GitHub <span aria-hidden="true">↗</span>
+          </a>
+          <button id="theme-toggle" type="button" aria-label="Switch to Paper color mode" title="Switch Noir / Paper">
+            Paper <span aria-hidden="true">◐</span>
+          </button>
+        </nav>
+      </div>
+    </header>
+    <main id="main">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div>
+        <a class="wordmark" href={url()}>
+          ~/sharecatalog
+        </a>
+        <p>A small tool for a useful document trail.</p>
+      </div>
+      <div class="footer-links">
+        <a href={url('docs/privacy/')}>Privacy</a>
+        <a href={`${site.repository}/blob/main/LICENSE`}>MIT license</a>
+        <a href="https://github.com/nandomoreirame/terminalnoir-astro-theme">Terminal Noir theme</a>
+        <a href={url('credits/')}>Credits</a>
+      </div>
+      <p class="footer-note">Built with Python &amp; PySide6. Documentation built with Astro.</p>
+    </footer>
+    <div id="copy-status" class="sr-only" role="status" aria-live="polite"></div>
+    <script>
+      const toggle = document.querySelector<HTMLButtonElement>('#theme-toggle');
+      function updateThemeLabel() {
+        const light = document.documentElement.dataset.theme === 'light';
+        if (toggle) {
+          toggle.textContent = light ? 'Noir ◑' : 'Paper ◐';
+          toggle.setAttribute('aria-label', `Switch to ${light ? 'Noir' : 'Paper'} color mode`);
+        }
+      }
+      updateThemeLabel();
+      toggle?.addEventListener('click', () => {
+        const theme = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+        document.documentElement.dataset.theme = theme;
+        try {
+          localStorage.setItem('tn-theme', theme);
+        } catch {}
+        updateThemeLabel();
+      });
+      document.querySelectorAll<HTMLPreElement>('pre').forEach(pre => {
+        const code = pre.querySelector('code');
+        if (!code) return;
+        const wrapper = document.createElement('div');
+        wrapper.className = 'code-wrap';
+        pre.parentNode?.insertBefore(wrapper, pre);
+        wrapper.append(pre);
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'copy-button';
+        button.textContent = 'Copy';
+        button.setAttribute('aria-label', 'Copy code to clipboard');
+        wrapper.append(button);
+        button.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(code.textContent || '');
+            button.textContent = 'Copied';
+            const status = document.querySelector('#copy-status');
+            if (status) status.textContent = 'Code copied to clipboard.';
+          } catch {
+            button.textContent = 'Select text to copy';
+          }
+          window.setTimeout(() => {
+            button.textContent = 'Copy';
+          }, 2200);
+        });
+      });
+    </script>
+  </body>
+</html>

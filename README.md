@@ -5,13 +5,17 @@ Everything into an editable catalog with SharePoint document links. Copy a table
 into Confluence, export CSV or HTML, and save your work as JSON. No Microsoft Graph
 permissions, Confluence tokens, administrator access, or remote service required.
 
-**Screenshot: not yet available.**
+[Read the documentation](https://tidus747.github.io/sharecatalog/) for installation,
+library mappings, export and troubleshooting.
+
+![ShareCatalog displaying fictional engineering documents](website/public/images/sharecatalog.png)
 
 ## Features
 
 - Background Everything CLI searches within a local synchronized directory.
 - Custom extensions or all file types, literal filename text, configurable result limit.
 - Explicit local-root to SharePoint-library mappings, including nested mappings.
+- OneDrive registry detection proposes a library mapping without synced file access.
 - Sample mapping confirmation before export, plus individual link review states.
 - Editable titles and descriptions, inclusion checkboxes, sorting and local filtering.
 - Confluence clipboard HTML with real anchors and a plain-text fallback.
@@ -52,9 +56,12 @@ application if they interfere with output or search behavior.
    Filename text is a literal, case-insensitive substring, not Everything query syntax.
 2. Click **Search Everything**. The count is accepted files returned, not a total
    beyond the configured limit. Narrow your search when the limit is reached.
-3. Configure each library in **Configure mappings**. Local folder names do not need
-   to match SharePoint names. The most specific local root wins.
-4. Select a mapping and click **Test Mapping**. Choose an existing sample file, click
+3. Open **Configure mappings**, click **Detect from OneDrive** to prefill a candidate
+   for the search directory, review it, and save. Alternatively enter a mapping manually.
+   Detection reads only the current user's registry, not synced files. Registry fields
+   are undocumented implementation details; missing/conflicting entries require manual setup.
+   Local folder names do not need to match SharePoint names. The most specific root wins.
+4. Select a mapping and click **Test Mapping**. Paste an existing sample file path, click
    **Open in Browser**, and confirm only after the correct document opens.
 5. Double-click a title or description, or press F2, to edit it. Filenames and URLs
    are read-only. Use the context menu to open, copy, review, include, or exclude links.
@@ -81,7 +88,8 @@ Use an HTTPS library root, not `AllItems.aspx`, a sharing-token link, a `file://
 URL, or an arbitrary copied document link. Supported hosts are tenant subdomains
 of `sharepoint.com`, `sharepoint.us`, `sharepoint.de`, and `sharepoint.cn`, with
 `/sites`, `/teams`, or `/personal` library paths. Root components must be valid
-percent-encoded URL components. Unsupported forms are rejected conservatively.
+URL components. Spaces and Unicode in root paths are encoded automatically; existing
+percent encoding is preserved. Unsupported forms are rejected conservatively.
 
 **A generated URL is not remotely verified.** A manually confirmed sample supports
 using that mapping but does not validate every document, permission, move, or sync
@@ -93,7 +101,8 @@ block export; fix the mapping or uncheck those entries. Changing a mapping reset
 its confirmation, and changed document URLs reset individual reviews.
 
 OneDrive shortcuts, junctions, renamed folders, custom domains, and ambiguous sync
-layouts cannot be discovered authoritatively in v0.1. Configure a dedicated mapping
+layouts cannot be discovered authoritatively in v0.1. Detection is only a proposal.
+Configure a dedicated mapping
 and test a real sample. No sharing links or permissions are created or changed.
 See [mapping details](docs/sharepoint-mapping.md).
 
@@ -114,7 +123,9 @@ or external styles. Save exports outside the repository, for example in `exports
 No telemetry, analytics, uploads, content extraction, credentials, or remote backend.
 Source documents are never renamed, moved, modified, or downloaded by ShareCatalog.
 Opening a link uses your browser and its normal authentication. Selecting a sample
-checks file existence only. Searches use local Everything IPC. A temporary output
+checks file existence only. Registry detection performs no synced filesystem access.
+Sample paths use text input instead of an Explorer file picker, which can activate
+OneDrive handlers. Searches use local Everything IPC. A temporary output
 file containing result paths is deleted when the search finishes; a crash may leave
 it in the OS temporary directory.
 
@@ -146,6 +157,10 @@ Structure: `src/sharecatalog/models/` contains records and merge behavior;
 `services/` contains search, mapping, export, preferences, and persistence;
 `ui/` contains Qt models, dialogs, and the main window; `tests/` contains regression
 tests; `docs/` explains architecture, mapping, validation, and distribution.
+
+The Astro documentation site lives in `website/` and renders the guides in `docs/`
+directly. See [website development](docs/website.md) for Node.js setup, tests and
+GitHub Pages deployment. Node.js is not needed to run the desktop application.
 
 ## Build a Windows executable
 
@@ -188,7 +203,7 @@ with the complete package and dependency notices.
 
 ## License
 
-MIT, with a replaceable copyright holder placeholder in [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).
 Third-party dependencies have separate terms, particularly Qt/PySide6. The initial
 repository license was GPLv3; this implementation changes the project license to
 MIT as requested by the owner. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

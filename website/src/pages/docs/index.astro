@@ -1,0 +1,26 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { navigation, url } from '../../lib/site';
+---
+
+<Layout title="Documentation">
+  <div class="doc-index">
+    <p class="eyebrow">ShareCatalog / Field guide</p>
+    <h1>A useful catalog starts here.</h1>
+    <p class="section-copy">
+      Install the app, connect the right library, and turn indexed files into an editable reference. These guides also
+      explain what a generated link can and cannot prove.
+    </p>
+    {navigation.map(group => (
+      <section>
+        <h2 class="eyebrow">{group.label}</h2>
+        {group.items.map(([slug, label]) => (
+          <a href={url(`docs/${slug}/`)}>
+            {label}
+            <span aria-hidden="true">→</span>
+          </a>
+        ))}
+      </section>
+    ))}
+  </div>
+</Layout>

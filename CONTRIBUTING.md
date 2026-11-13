@@ -15,3 +15,8 @@ Describe the problem, resulting behavior, validation and limitations in the PR.
 Windows is primary. Services must remain testable without Windows/Everything.
 Use the manual checklist for external integrations. Avoid speculative dependencies,
 telemetry, uploads, document modifications, and automatic sharing changes.
+
+For documentation site changes, use Node.js 22.22+ in `website/`, run `npm ci`,
+`npm run format:check`, `npm run verify`, and `npm run test:e2e` after installing
+Chromium with `npx playwright install chromium`. Guides are rendered directly from
+`docs/`. Preserve Terminal Noir and font license notices. See `docs/website.md`.

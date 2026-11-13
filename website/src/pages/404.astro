@@ -1,0 +1,17 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { url } from '../lib/site';
+---
+
+<Layout title="Page not found">
+  <div class="doc-index">
+    <p class="eyebrow">404 / Missing reference</p>
+    <h1>This page is not in the catalog.</h1>
+    <p class="section-copy">
+      The address may have changed. Start with the documentation index to find the guide you need.
+    </p>
+    <a class="button primary mt-8" href={url('docs/')}>
+      Open documentation →
+    </a>
+  </div>
+</Layout>

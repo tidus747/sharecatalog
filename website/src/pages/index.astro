@@ -1,0 +1,172 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import { site, url } from '../lib/site';
+const steps = [
+  {
+    number: '01',
+    title: 'Find your documents.',
+    body: 'Search the Everything index by directory, file extension and filename. Keep your original files exactly where they are.',
+    link: 'catalog-workflow',
+    action: 'Explore the workflow',
+  },
+  {
+    number: '02',
+    title: 'Connect the right library.',
+    body: 'Detect a OneDrive library mapping or enter it yourself. Open a sample in your browser and confirm the correct document.',
+    link: 'sharepoint-mapping',
+    action: 'Understand mappings',
+  },
+  {
+    number: '03',
+    title: 'Make the catalog yours.',
+    body: 'Edit titles and descriptions. Choose the documents to include, then copy a table with clickable links into Confluence.',
+    link: 'exports',
+    action: 'See export options',
+  },
+];
+---
+
+<Layout>
+  <section class="hero">
+    <div class="container">
+      <div class="hero-top">
+        <p class="eyebrow">A document trail, without the busywork</p>
+        <span class="release">v{site.version} · Windows desktop</span>
+      </div>
+      <div class="hero-grid">
+        <h1>
+          Your documents.
+          <br />
+          <em>Connected.</em>
+        </h1>
+        <div class="hero-copy">
+          <p>
+            Turn the files you already have into a useful document catalog. Search with Everything, connect SharePoint
+            links, and bring a clean table to Confluence.
+          </p>
+          <div class="actions">
+            <a class="button primary" href={url('docs/getting-started/')}>
+              Get started <span aria-hidden="true">→</span>
+            </a>
+            <a class="button" href={site.repository}>
+              View source <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+          <div class="detail-line">Open source · Runs locally · No API tokens required</div>
+        </div>
+      </div>
+      <figure>
+        <div class="app-frame">
+          <div class="frame-bar" aria-hidden="true">
+            <i></i>
+            <i></i>
+            <i></i>
+            <span>ShareCatalog / Engineering catalog</span>
+          </div>
+          <img
+            src={url('images/sharecatalog.png')}
+            width="1440"
+            height="860"
+            alt="ShareCatalog desktop application showing fictional engineering documents, editable descriptions, inclusion checkboxes and SharePoint links"
+            fetchpriority="high"
+          />
+        </div>
+        <figcaption class="image-caption">
+          <span>The actual desktop app, populated with fictional example documents.</span>
+          <span>Files stay in place. The catalog is yours to edit.</span>
+        </figcaption>
+      </figure>
+      <div class="capabilities">
+        <span>Everything search</span>
+        <span>SharePoint mappings</span>
+        <span>Editable catalog</span>
+        <span>Confluence / CSV / HTML</span>
+      </div>
+    </div>
+  </section>
+  <section class="content-section">
+    <div class="container">
+      <SectionHeader
+        eyebrow="From a folder to a reference"
+        title="Three steps. One useful catalog."
+        description="A focused desktop workflow for the files synchronized on your Windows machine."
+      />
+      <div class="steps">
+        {steps.map(step => (
+          <article class="step">
+            <span class="step-number">{step.number} /</span>
+            <h3>{step.title}</h3>
+            <p>{step.body}</p>
+            <a href={url(`docs/${step.link}/`)}>
+              {step.action} <span aria-hidden="true">→</span>
+            </a>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+  <section class="content-section">
+    <div class="container split">
+      <div>
+        <p class="eyebrow">Links you can inspect</p>
+        <h2 class="section-title">
+          The right root.
+          <br />A clear path forward.
+        </h2>
+        <p class="section-copy">
+          A synced folder name is not a SharePoint address. ShareCatalog keeps that relationship explicit, prefers the
+          most specific library mapping, and encodes each path segment correctly.
+        </p>
+        <p class="notice">
+          <strong>Generated does not mean verified.</strong> Confirm a sample mapping before export. Other documents
+          stay unreviewed until you check them individually.
+        </p>
+        <a class="button mt-6" href={url('docs/onedrive-diagnostics/')}>
+          How detection works <span aria-hidden="true">→</span>
+        </a>
+      </div>
+      <div class="sample-box">
+        <span class="code-label">01 / Local library</span>
+        <code>C:\Catalog\Engineering</code>
+        <hr />
+        <span class="code-label">02 / SharePoint library</span>
+        <code>https://contoso.sharepoint.com/sites/Engineering/Shared%20Documents</code>
+        <hr />
+        <span class="code-label">03 / Relative document path</span>
+        <code>Calibration\Reference #1.pdf</code>
+        <hr />
+        <span class="code-label">Encoded for the browser</span>
+        <code class="text-accent">…/Calibration/Reference%20%231.pdf</code>
+      </div>
+    </div>
+  </section>
+  <section class="content-section quickstart" id="quickstart">
+    <div class="container split">
+      <div>
+        <p class="eyebrow">Get it running</p>
+        <h2 class="section-title">
+          Small setup.
+          <br />
+          Useful every day.
+        </h2>
+        <p class="section-copy">
+          Install from source with Python 3.11 or newer. Everything and its separate CLI must be installed and running.
+          The full guide covers setup, mapping and your first export.
+        </p>
+        <a class="button mt-6" href={url('docs/getting-started/')}>
+          Read the installation guide <span aria-hidden="true">→</span>
+        </a>
+      </div>
+      <div>
+        <div class="frame-bar">
+          <span>PowerShell / from a checkout</span>
+        </div>
+        <div class="install-command">
+          <pre><code>{`py -3.11 -m venv .venv\n.\\.venv\\Scripts\\python.exe -m pip install -e .\n.\\.venv\\Scripts\\python.exe -m sharecatalog`}</code></pre>
+        </div>
+        <p class="detail-line">No Graph authentication. No Confluence token. No telemetry.</p>
+      </div>
+    </div>
+  </section>
+</Layout>

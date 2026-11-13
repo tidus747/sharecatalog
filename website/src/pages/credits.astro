@@ -1,0 +1,43 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { url, site } from '../lib/site';
+---
+
+<Layout title="Credits and licenses">
+  <article class="doc-index prose">
+    <p class="eyebrow">Open source / Acknowledgments</p>
+    <h1>Credits and licenses</h1>
+    <p>
+      ShareCatalog is made possible by open-source tools and their maintainers. The application source uses the MIT
+      license; its dependencies retain their own terms.
+    </p>
+    <h2>Terminal Noir</h2>
+    <p>
+      This site adapts the palette, typography, global styles and section component from{' '}
+      <a href="https://github.com/nandomoreirame/terminalnoir-astro-theme">Terminal Noir</a>, copyright 2026 Fernando
+      Moreira. <a href={url('licenses/terminal-noir-MIT.txt')}>Read the original MIT notice</a>.
+    </p>
+    <h2>Locally hosted fonts</h2>
+    <p>
+      Inter, Newsreader and JetBrains Mono are served with the site through Fontsource packages, under their SIL Open
+      Font License terms.
+    </p>
+    <ul>
+      <li>
+        <a href={url('licenses/inter-OFL.txt')}>Inter license and copyright notices</a>
+      </li>
+      <li>
+        <a href={url('licenses/newsreader-OFL.txt')}>Newsreader license and copyright notices</a>
+      </li>
+      <li>
+        <a href={url('licenses/jetbrains-mono-OFL.txt')}>JetBrains Mono license and copyright notices</a>
+      </li>
+    </ul>
+    <h2>Application dependencies</h2>
+    <p>
+      Python, PySide6/Qt and build tools have separate licenses. Everything and ES remain external dependencies and are
+      not distributed with ShareCatalog. See the repository's{' '}
+      <a href={`${site.repository}/blob/main/THIRD_PARTY_NOTICES.md`}>third-party notices</a> for distribution details.
+    </p>
+  </article>
+</Layout>
