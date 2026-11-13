@@ -11,7 +11,15 @@ once. Unicode, spaces, `#`, `%`, `&`, and `+` are supported. Windows forbids `?`
 local filenames. Invalid/ambiguous Windows path syntax is rejected. Query strings,
 fragments, view pages and sharing-token URLs cannot be roots.
 
-Select an existing local sample, open the generated URL and confirm the correct
+Use **Detect from OneDrive** to prefill a candidate for the current search directory.
+Detection reads only `MountPoint` and `UrlNamespace` from the current Windows user's
+registry, merges equivalent entries and proposes the most specific root. Conflicting
+or unsupported entries at that root block fallback to a broader OneDrive root.
+Apply and save explicitly; detection does not confirm the mapping. Registry fields
+are undocumented implementation details and may be missing, stale or misleading
+for shortcuts. Root path spaces are encoded automatically.
+
+Select an existing catalog row or paste a sample path, open the generated URL and confirm the correct
 document opens. Confirmation becomes available only after opening the browser.
 The project stores sample path, exact generated URL and UTC confirmation time.
 Changed mappings need new confirmation. Test every library used in an export.

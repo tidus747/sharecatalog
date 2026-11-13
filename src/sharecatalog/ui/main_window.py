@@ -310,7 +310,9 @@ class MainWindow(QMainWindow):
             )
 
     def configure_mappings(self):
-        dialog = MappingDialog(self.project.mappings, self)
+        dialog = MappingDialog(
+            self.project.mappings, self, search_directory=self.directory.text().strip()
+        )
         if dialog.exec():
             self.project.mappings = dialog.mappings
             self.project.refresh([])
@@ -323,7 +325,9 @@ class MainWindow(QMainWindow):
         if row < 0:
             self.configure_mappings()
             return
-        if MappingTestDialog(self.project.mappings[row], self).exec():
+        document = self.current_document()
+        sample_path = document.local_path if document else ""
+        if MappingTestDialog(self.project.mappings[row], self, sample_path=sample_path).exec():
             self.mapping_status()
             self.modified()
 

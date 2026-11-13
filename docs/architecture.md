@@ -22,6 +22,13 @@ Custom ES defaults can affect behavior.
 `MappingResolver` rules. Export recomputes URLs and requires confirmed sample mappings.
 Confirmation metadata is a historical user assertion, not cryptographic proof.
 
+The optional OneDrive detector reads current-user registry metadata only. It proposes
+the most specific matching local/web root, merges equivalent duplicates and rejects
+ambiguous or invalid entries at that root instead of falling back to a parent.
+The user accepts the proposal explicitly and still confirms a browser sample.
+The detector never resolves, opens, stats or enumerates synced paths. Registry fields
+are undocumented implementation details, so detection cannot establish correctness.
+
 The Qt model exposes title/description edit roles and inclusion check roles. A proxy
 sorts and filters. QThread workers run search/probe subprocesses; results merge on
 the GUI thread. Mapping changes and project opening are disabled during search.

@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (
     QFileDialog,
     QFormLayout,
     QHBoxLayout,
+    QInputDialog,
     QLabel,
     QLineEdit,
     QListWidget,
@@ -18,6 +19,8 @@ from PySide6.QtWidgets import (
 )
 
 from sharecatalog.models.library import LibraryMapping
+from sharecatalog.services.onedrive import discover_mapping
+from sharecatalog.services.paths import path_key
 from sharecatalog.services.sharepoint import (
     MappingResolver,
     confirm_mapping,
@@ -28,11 +31,12 @@ from sharecatalog.services.sharepoint import (
 
 
 class MappingDialog(QDialog):
-    def __init__(self, mappings: list[LibraryMapping], parent=None):
+    def __init__(self, mappings: list[LibraryMapping], parent=None, search_directory: str = ""):
         super().__init__(parent)
         self.setWindowTitle("SharePoint library mappings")
         self.resize(820, 470)
         self.mappings = deepcopy(mappings)
+        self.search_directory = search_directory
         layout = QVBoxLayout(self)
         note = QLabel(
             "Add each synced library explicitly. OneDrive shortcuts and junctions may need "
@@ -59,6 +63,7 @@ class MappingDialog(QDialog):
         layout.addLayout(form)
         actions = QHBoxLayout()
         for label, handler in (
+            ("Detect from OneDrive", self.detect),
             ("New", self.new),
             ("Apply mapping", self.apply),
             ("Remove", self.remove),
@@ -68,6 +73,7 @@ class MappingDialog(QDialog):
             actions.addWidget(button)
         layout.addLayout(actions)
         self.status = QLabel()
+        self.status.setWordWrap(True)
         layout.addWidget(self.status)
         buttons = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Save | QDialogButtonBox.StandardButton.Cancel
@@ -77,6 +83,42 @@ class MappingDialog(QDialog):
         layout.addWidget(buttons)
         self.list.currentRowChanged.connect(self.select)
         self.redraw()
+
+    def detect(self):
+        directory = self.search_directory or self.root.text().strip()
+        if not directory:
+            QMessageBox.information(
+                self, "Directory required", "Choose a search directory or enter a local root first."
+            )
+            return
+        try:
+            candidate = discover_mapping(directory)
+        except ValueError as exc:
+            QMessageBox.warning(self, "OneDrive detection", str(exc))
+            return
+        if candidate is None:
+            QMessageBox.information(
+                self,
+                "OneDrive detection",
+                "No matching registry mapping was found for this Windows user. "
+                "Enter the local root and library URL manually.",
+            )
+            return
+        existing = next(
+            (
+                i
+                for i, m in enumerate(self.mappings)
+                if path_key(m.local_root) == path_key(candidate.local_root)
+            ),
+            -1,
+        )
+        self.list.setCurrentRow(existing)
+        self.root.setText(candidate.local_root)
+        self.url.setText(candidate.library_url)
+        self.status.setText(
+            "Detected the most specific registry candidate. Review and apply it, "
+            "then test a sample. No synced files were queried."
+        )
 
     def redraw(self, selected=-1):
         self.list.blockSignals(True)
@@ -146,11 +188,12 @@ class MappingDialog(QDialog):
 
 
 class MappingTestDialog(QDialog):
-    def __init__(self, mapping: LibraryMapping, parent=None):
+    def __init__(self, mapping: LibraryMapping, parent=None, sample_path: str = ""):
         super().__init__(parent)
         self.setWindowTitle("Test library mapping")
         self.resize(760, 280)
         self.mapping = mapping
+        self.suggested_sample = sample_path or mapping.sample_path
         self.sample = ""
         self.opened_url = ""
         layout = QVBoxLayout(self)
@@ -163,7 +206,7 @@ class MappingTestDialog(QDialog):
         self.path = QLabel("No sample selected")
         self.path.setWordWrap(True)
         layout.addWidget(self.path)
-        choose = QPushButton("Choose sample file...")
+        choose = QPushButton("Enter sample file path...")
         choose.clicked.connect(self.choose)
         layout.addWidget(choose)
         self.url = QLineEdit()
@@ -182,11 +225,15 @@ class MappingTestDialog(QDialog):
         layout.addWidget(cancel)
 
     def choose(self):
-        sample, _ = QFileDialog.getOpenFileName(
-            self, "Choose sample inside this library", self.mapping.local_root
+        sample, accepted = QInputDialog.getText(
+            self,
+            "Sample inside this library",
+            "Paste an existing sample file path. No Explorer file picker is used.",
+            text=self.suggested_sample,
         )
-        if not sample:
+        if not accepted or not sample.strip():
             return
+        sample = sample.strip().strip('"')
         self.confirm_button.setEnabled(False)
         self.opened_url = ""
         try:

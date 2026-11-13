@@ -25,7 +25,8 @@ def validate_library_url(value: str) -> str:
         or parts.password
         or parts.query
         or parts.fragment
-        or any(ord(c) < 32 or c.isspace() for c in value)
+        or value != value.strip()
+        or any(ord(c) < 32 for c in value)
         or "\\" in value
     ):
         raise ValueError("Use a direct HTTPS SharePoint library URL without query or fragment.")

@@ -27,6 +27,19 @@ Before publishing v0.1.0, use disposable authorized data outside Git:
 Record live results before claiming release acceptance. Sample confirmation does
 not guarantee every catalog link. Mocked tests cannot replace these checks.
 
+## OneDrive detection revision
+
+- 66 automated tests passed, including longest-root selection, duplicate handling,
+  conflict rejection, root space encoding and detection without filesystem calls.
+- GUI tests cover candidate review before applying and sample text input without
+  an Explorer file picker. Ruff checks and the repository text check passed.
+- The corrected registry-only PowerShell diagnostic was run on a nonexistent
+  fictional input path. It made no file lookup and reported no registered provider
+  in the execution account. It still needs a target-user OneDrive test.
+- Live Files On-Demand no-hydration behavior and the generated sample browser link
+  need confirmation on the actual target installation. The first diagnostic was
+  observed to download a file; its Shell queries and native file picker were removed.
+
 ## Development verification, November 13, 2026
 
 - Windows, Python 3.11.9: 56 pytest tests passed, including offscreen GUI tests.

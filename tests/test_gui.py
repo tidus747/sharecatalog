@@ -88,3 +88,44 @@ def test_save_commits_active_editor(app, project, tmp_path):
     assert window.save()
     assert load_project(window.project_path).documents[0].title == "Saved while editing"
     window.close()
+
+
+def test_detection_prefills_without_applying_or_confirming(app, mapping, monkeypatch):
+    from sharecatalog.models.library import LibraryMapping
+    from sharecatalog.services.sharepoint import mapping_confirmed
+
+    candidate = LibraryMapping(mapping.local_root, mapping.library_url)
+    calls = []
+
+    def detect(directory):
+        calls.append(directory)
+        return candidate
+
+    monkeypatch.setattr("sharecatalog.ui.mapping_dialog.discover_mapping", detect)
+    dialog = MappingDialog([], search_directory=r"C:\Catalog\Nested")
+    dialog.detect()
+    assert calls == [r"C:\Catalog\Nested"]
+    assert dialog.root.text() == candidate.local_root
+    assert dialog.url.text() == candidate.library_url
+    assert dialog.mappings == []
+    assert dialog.apply()
+    assert len(dialog.mappings) == 1
+    assert not mapping_confirmed(dialog.mappings[0])
+
+
+def test_sample_path_uses_text_dialog_instead_of_file_picker(app, mapping, monkeypatch):
+    from PySide6.QtWidgets import QFileDialog, QInputDialog
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("Native file selection is forbidden in sample validation")
+
+    monkeypatch.setattr(QFileDialog, "getOpenFileName", forbidden)
+    monkeypatch.setattr(
+        QInputDialog, "getText", lambda *args, **kwargs: (r"C:\Catalog\Guide.pdf", True)
+    )
+    monkeypatch.setattr("sharecatalog.ui.mapping_dialog.Path.is_file", lambda path: True)
+    dialog = MappingTestDialog(mapping)
+    dialog.choose()
+    assert dialog.url.text().endswith("/Guide.pdf")
+    assert dialog.open_button.isEnabled()
+    assert not dialog.confirm_button.isEnabled()

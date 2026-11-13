@@ -1,5 +1,6 @@
 """Launch the real entry point and check its native window, then stop the smoke process."""
 
+import argparse
 import ctypes
 import os
 import subprocess
@@ -12,9 +13,16 @@ def main() -> int:
     if os.name != "nt":
         raise SystemExit("This native-window smoke check requires Windows.")
     root = Path(__file__).resolve().parents[1]
+    parser = argparse.ArgumentParser()
+    selection = parser.add_mutually_exclusive_group()
+    selection.add_argument("--packaged", action="store_true")
+    selection.add_argument("--executable", type=Path)
+    options = parser.parse_args()
     command = (
-        [str(root / "dist/ShareCatalog/ShareCatalog.exe")]
-        if "--packaged" in sys.argv
+        [str(options.executable.resolve())]
+        if options.executable
+        else [str(root / "dist/ShareCatalog/ShareCatalog.exe")]
+        if options.packaged
         else [sys.executable, "-m", "sharecatalog"]
     )
     environment = dict(os.environ)
